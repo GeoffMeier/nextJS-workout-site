@@ -13,7 +13,6 @@ import { useWorkouts } from "../_workout/queries";
 
 import workouts from "../page";
 export default function startWorkout() {
-	console.log(workouts.apply());
 	return (
 		<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 to-gray-700">
 			<div className="p-10 md:w-screen md:h-screen">
