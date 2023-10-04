@@ -5,11 +5,11 @@ import { UserButton, useUser } from "@clerk/nextjs";
 const Header = ({ username }) => {
 	const { isLoaded, isSignedIn, user } = useUser();
 	return (
-		<nav className="flex items-center justify-between px-6 py-4 mb-5 bg-blue-700">
+		<nav className="flex items-center justify-between px-6 py-4 bg-gradient-to-b from-indigo-700 to-gray-950">
 			<div className="flex items-center">
 				<Link href="/">
-					<div className="text-lg font-bold text-white uppercase">
-						Geoffs Workout Builder
+					<div className="text-lg font-bold text-slate-300 uppercase">
+						The Workout Builder
 					</div>
 				</Link>
 			</div>

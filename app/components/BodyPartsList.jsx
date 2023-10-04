@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 
 const BodyPartsList = () => {
 	const [bodyParts, setBodyParts] = useState([]);
-	const apiUrl = "https://exercisedb.p.rapidapi.com/exercises/bodyPartList";
+	const [skeleton, setSkeleton] = useState("");
+	const apiMuscleUrl =
+		"https://exercisedb.p.rapidapi.com/exercises/bodyPartList";
 
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchMuscles = async () => {
 			try {
-				const response = await fetch(apiUrl, {
+				const response = await fetch(apiMuscleUrl, {
 					method: "GET",
 					headers: {
 						"X-RapidAPI-Key":
@@ -22,13 +24,14 @@ const BodyPartsList = () => {
 				}
 
 				const data = await response.json();
+				console.log(data);
 				setBodyParts(data);
 			} catch (error) {
 				console.error("Error fetching data:", error);
 			}
 		};
 
-		fetchData();
+		fetchMuscles();
 	}, []);
 
 	return (
