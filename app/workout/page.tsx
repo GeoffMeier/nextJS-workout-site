@@ -13,18 +13,51 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import React, { useState } from "react";
+import {
+	DifficultyLevel,
+	Exercise,
+	NewExercise,
+	TypeOfExercise,
+	TypeOfMuscle,
+	typeOfExercise,
+} from "./_workout/exercises";
 
 export default function workouts() {
-	const [startWorkout, setStartWorkout] = useState({});
+	const [startWorkout, setStartWorkout] = useState<Exercise[]>([]);
+	const [work, setWork] = useState<NewExercise>();
 	const generateExercises = useAddWorkout();
 	const workouts = useWorkouts();
 
-	const handleClick = (e) => {
-		workouts.data.allWorkouts.find((workout) => {
-			workout.id === e.id ? setStartWorkout(workout) : "";
+	const handleClick = async (e) => {
+		e.preventDefault();
+		const getWorkoutById = workouts.data.allWorkouts.at(e.id);
+		setWork({
+			...work,
+			name: getWorkoutById.name,
 		});
-	};
 
+		setWork({
+			...work,
+			difficulty: getWorkoutById.level as DifficultyLevel,
+		});
+		setWork({
+			...work,
+			type: getWorkoutById.type as TypeOfExercise,
+		});
+		setWork({
+			...work,
+			muscle: getWorkoutById.muscle as TypeOfMuscle,
+		});
+
+		const { difficulty, ...rest } = work;
+		const res = await generateExercises.mutateAsync({
+			...rest,
+			level: difficulty,
+		});
+
+		setStartWorkout(await res.json());
+	};
+	console.log(startWorkout);
 	if (workouts.loading) {
 		return <div>loading...</div>;
 	}
@@ -38,14 +71,14 @@ export default function workouts() {
 				<h2 className="text-indigo-500 text-center pb-10 font-semibold uppercase">
 					Ready to Start Workouts
 				</h2>
-				{!startWorkout.id && (
+				{startWorkout.length === 0 ? (
 					<div className="  border bg-zinc-800 md:rounded-lg py-4">
-						<Table id="workouts" className=" ">
+						<Table id="workouts" className="">
 							<TableCaption className="text-indigo-500 font-sans font-semibold pt-4">
 								Here's a list of workouts you have saved
 							</TableCaption>
-							<TableHeader>
-								<TableRow className="gap-10">
+							<TableHeader className="">
+								<TableRow className="">
 									<TableHead className="text-indigo-500 font-sans font-bold">
 										Name
 									</TableHead>
@@ -63,7 +96,7 @@ export default function workouts() {
 							</TableHeader>
 							{workouts.data.allWorkouts.map((workout) => (
 								<>
-									<TableBody key={workout.name}>
+									<TableBody key={workout.id}>
 										<TableRow>
 											<TableCell className="font-sm text-zinc-300">
 												{workout.name}
@@ -94,9 +127,13 @@ export default function workouts() {
 							))}
 						</Table>
 					</div>
+				) : (
+					""
 				)}
 
-				{startWorkout.id && (
+				{startWorkout.length === 0 ? (
+					""
+				) : (
 					<div className="  border bg-zinc-800 md:rounded-lg py-4">
 						<Table id="workouts" className=" ">
 							<TableCaption className="text-indigo-500 font-sans font-semibold pt-4">
@@ -119,33 +156,36 @@ export default function workouts() {
 									<TableHead className="text-indigo-500 font-sans font-bold"></TableHead>
 								</TableRow>
 							</TableHeader>
-							<TableBody key={startWorkout.id}>
-								<TableRow>
-									<TableCell className="font-sm text-zinc-300">
-										{startWorkout.name}
-									</TableCell>
+							{startWorkout.map((workout) => {
+								return (
+									<TableBody key={workout.name}>
+										<TableRow>
+											<TableCell className="font-sm text-zinc-300">
+												{workout.name}
+											</TableCell>
 
-									<TableCell className="font-sm text-zinc-300">
-										{startWorkout.muscle}
-									</TableCell>
-									<TableCell className="font-sm text-zinc-300">
-										{startWorkout.type}
-									</TableCell>
-									<TableCell className="font-sm text-zinc-300">
-										{startWorkout.level}
-									</TableCell>
-									<TableCell className="font-sm text-zinc-300">
-										<Button
-											className="font-bold bg-green-700 rounded p-1  text-zinc-300"
-											id={startWorkout.id}
-											onClick={handleClick}
-											type="button"
-										>
-											Finish
-										</Button>
-									</TableCell>
-								</TableRow>
-							</TableBody>
+											<TableCell className="font-sm text-zinc-300">
+												{workout.muscle}
+											</TableCell>
+											<TableCell className="font-sm text-zinc-300">
+												{workout.type}
+											</TableCell>
+											<TableCell className="font-sm text-zinc-300">
+												{workout.difficulty}
+											</TableCell>
+											<TableCell className="font-sm text-zinc-300">
+												<Button
+													className="font-bold bg-green-700 rounded p-1  text-zinc-300"
+													onClick={handleClick}
+													type="button"
+												>
+													Finish
+												</Button>
+											</TableCell>
+										</TableRow>
+									</TableBody>
+								);
+							})}
 						</Table>
 					</div>
 				)}
