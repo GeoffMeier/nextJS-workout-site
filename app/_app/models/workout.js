@@ -7,3 +7,11 @@ export const workouts = pgTable("workouts", {
 	level: text("level"),
 	muscle: text("muscle"),
 });
+
+export const LogExercises = pgTable("ExerciseLog", {
+	id: serial("id").primaryKey(),
+	name: text("name"),
+	sets: text("sets"),
+	reps: text("reps"),
+	weight: text("weight"),
+});

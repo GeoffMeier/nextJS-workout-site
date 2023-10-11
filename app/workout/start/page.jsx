@@ -9,71 +9,62 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-import { useWorkouts } from "../_workout/queries";
+import { usePendingWorkouts, useWorkouts } from "../_workout/queries";
 
-import workouts from "../page";
 export default function startWorkout() {
+	const workouts = usePendingWorkouts();
+	if (workouts.loading) {
+		return <div>loading...</div>;
+	}
+	if (workouts.error) {
+		return <div>error retrieving workouts</div>;
+	}
 	return (
 		<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 to-gray-700">
 			<div className="p-10 md:w-screen md:h-screen">
 				<h2 className="text-indigo-500 text-center pb-10 font-semibold uppercase">
-					Ready to Start Workouts
+					BEGIN workout
 				</h2>
 				<div className="  border bg-zinc-800 md:rounded-lg py-4">
 					<Table id="workouts" className=" ">
-						<TableCaption className="text-indigo-500 font-sans font-semibold pt-4">
-							Here's a list of workouts you have saved
-						</TableCaption>
 						<TableHeader>
 							<TableRow className="gap-10">
 								<TableHead className="text-indigo-500 font-sans font-bold">
-									Exercise Name
+									Name
 								</TableHead>
 								<TableHead className="text-indigo-500 font-sans font-bold">
-									Instructions
+									Muscle
 								</TableHead>
 								<TableHead className="text-indigo-500 font-sans font-bold">
-									Weight
+									Type
 								</TableHead>
 								<TableHead className="text-indigo-500 font-sans font-bold">
-									Sets
-								</TableHead>
-								<TableHead className="text-indigo-500 font-sans font-bold">
-									Reps
+									level
 								</TableHead>
 							</TableRow>
 						</TableHeader>
 
-						{workouts.workoutInProgress &&
-							workouts.workoutInProgress.map((workout) => (
-								<>
-									<TableBody key={workout.name}>
-										<TableRow>
-											<TableCell className="font-sm text-zinc-300">
-												{workout.name}
-											</TableCell>
+						{workouts.data.allWorkouts.map((workout) => (
+							<>
+								<TableBody key={workout.id}>
+									<TableRow>
+										<TableCell className="font-sm text-zinc-300">
+											{workout.name}
+										</TableCell>
 
-											<TableCell className="font-sm text-zinc-300">
-												{workout.muscle}
-											</TableCell>
-											<TableCell className="font-sm text-zinc-300">
-												{workout.type}
-											</TableCell>
-											<TableCell className="font-sm text-zinc-300">
-												{workout.level}
-											</TableCell>
-											<TableCell className="font-sm text-zinc-300">
-												<Link
-													className="font-bold bg-green-700 rounded p-1  text-zinc-300"
-													href="/workout/start"
-												>
-													Start Workout
-												</Link>
-											</TableCell>
-										</TableRow>
-									</TableBody>
-								</>
-							))}
+										<TableCell className="font-sm text-zinc-300">
+											{workout.muscle}
+										</TableCell>
+										<TableCell className="font-sm text-zinc-300">
+											{workout.type}
+										</TableCell>
+										<TableCell className="font-sm text-zinc-300">
+											{workout.level}
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</>
+						))}
 					</Table>
 				</div>
 			</div>

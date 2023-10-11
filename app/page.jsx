@@ -19,20 +19,20 @@ import { HomeIcon } from "@radix-ui/react-icons";
 
 const components = [
 	{
-		title: "create a workout",
+		title: "Create a workout",
 		href: "/workout/create",
 		description:
 			"A modal dialog that interrupts the user with important content and expects a response.",
 	},
 	{
-		title: "workout history",
-		href: "/docs/primitives/hover-card",
+		title: "Workouts",
+		href: "/workout",
 		description:
 			"For sighted users to preview content available behind a link.",
 	},
 	{
-		title: "Progress",
-		href: "/docs/primitives/progress",
+		title: "History",
+		href: "/workout/history",
 		description:
 			"Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
 	},

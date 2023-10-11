@@ -8,7 +8,16 @@ type Workout = {
 	muscle: string;
 };
 
-import { Exercise } from "./exercises";
+type Log = {
+	id: string;
+	name: string;
+	sets: string;
+	reps: string;
+	weight: string;
+};
+
+import { Exercise, NewExerciseLog } from "./exercises";
+import { ExerciseLog } from "./exercises";
 type NewWorkout = Omit<Workout, "id">;
 export function useWorkouts() {
 	return useAsyncData<{ allWorkouts: Workout[] }>({
@@ -19,6 +28,16 @@ export function useWorkouts() {
 		},
 	});
 }
+// type NewPendingWorkout = Omit<PendingWorkout, "id">;
+// export function usePendingWorkouts() {
+// 	return useAsyncData<{ allPendingWorkouts: PendingWorkout[] }>({
+// 		queryKey: ["pendingWorkouts", "all"],
+// 		queryFn: async () => {
+// 			const response = await fetch("/api/pendingWorkouts");
+// 			return response.json();
+// 		},
+// 	});
+// }
 
 export function useAddWorkout() {
 	return useMutation({
@@ -27,6 +46,35 @@ export function useAddWorkout() {
 			return await fetch("/api/exercises", {
 				method: "POST",
 				body: JSON.stringify(newWorkout),
+				headers: {
+					"content-type": "application/json",
+				},
+			});
+		},
+	});
+}
+type NewLog = Omit<Log, "id">;
+export function useAddExerciseLog() {
+	return useMutation({
+		mutationKey: ["pendingWorkouts", "add"],
+		mutationFn: async (exerciseLog: NewLog) => {
+			return await fetch("/api/pendingWorkouts", {
+				method: "POST",
+				body: JSON.stringify(exerciseLog),
+				headers: {
+					"content-type": "application/json",
+				},
+			});
+		},
+	});
+}
+export function useAddExerciseLogToPage() {
+	return useMutation({
+		mutationKey: ["pendingWorkouts", "save"],
+		mutationFn: async (newLog: { exercise: ExerciseLog[] } & NewLog) => {
+			return await fetch("/api/pendingWorkouts", {
+				method: "POST",
+				body: JSON.stringify(newLog),
 				headers: {
 					"content-type": "application/json",
 				},
@@ -49,3 +97,20 @@ export function useAddWorkoutToPage() {
 		},
 	});
 }
+
+// export function useAddPendingWorkoutToPage() {
+// 	return useMutation({
+// 		mutationKey: ["pendingWorkout", "save"],
+// 		mutationFn: async (
+// 			pendingWorkout: { exercise: Exercise[] } & NewPendingWorkout
+// 		) => {
+// 			return await fetch("/api/pendingWorkouts", {
+// 				method: "POST",
+// 				body: JSON.stringify(pendingWorkout),
+// 				headers: {
+// 					"content-type": "application/json",
+// 				},
+// 			});
+// 		},
+// 	});
+// }

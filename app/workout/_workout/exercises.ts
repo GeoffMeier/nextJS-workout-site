@@ -49,7 +49,28 @@ export type Exercise = {
 	difficulty: DifficultyLevel;
 	instructions: string;
 };
+export type ExerciseLog = {
+	name: string;
+	sets: string;
+	reps: string;
+	weight: string;
+};
 export type NewExercise = Pick<
 	Exercise,
 	"name" | "type" | "muscle" | "difficulty"
 >;
+export type NewExerciseLog = Pick<
+	ExerciseLog,
+	"name" | "sets" | "reps" | "weight"
+>;
+
+export type PendingWorkout = {
+	name: string;
+	type: TypeOfExercise;
+	muscle: TypeOfMuscle;
+	difficulty: DifficultyLevel;
+	instructions: string;
+	sets: string;
+	reps: string;
+	weight: string;
+};
