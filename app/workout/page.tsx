@@ -1,6 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useAddWorkout, useWorkouts } from "./_workout/queries";
+import {
+	useAddWorkout,
+	useSavedExercises,
+	useWorkouts,
+} from "./_workout/queries";
 import {
 	Table,
 	TableBody,
@@ -29,41 +33,72 @@ export default function workouts() {
 	const [startWorkout, setStartWorkout] = useState<Exercise[]>([]);
 	const [work, setWork] = useState<NewExercise>();
 	const [getWorkoutName, setWorkoutName] = useState("");
-	const { getWorkoutId, setWorkoutId } = useState();
+	const [workoutId, setWorkoutId] = useState("");
+	const [workoutLevel, setWorkoutLevel] = useState("");
+	const [workoutMuscle, setWorkoutMuscle] = useState("");
+	const [workoutType, setWorkoutType] = useState("");
+	const [isPending, setPending] = useState(false);
 	const generateExercises = useAddWorkout();
 	const workouts = useWorkouts();
+	const SavedExercises = useSavedExercises();
 
-	const handleClick = async (e) => {
-		e.preventDefault();
-		const getWorkoutById = workouts.data.allWorkouts.at(e.id);
-		setWork({
-			...work,
-			name: getWorkoutById.name,
-		});
+	const handleClick = (e) => {
+		console.log(e.target.id);
 
-		setWork({
-			...work,
-			difficulty: getWorkoutById.level as DifficultyLevel,
-		});
-		setWork({
-			...work,
-			type: getWorkoutById.type as TypeOfExercise,
-		});
-		setWork({
-			...work,
-			muscle: getWorkoutById.muscle as TypeOfMuscle,
-		});
+		// SavedExercises.data.allWorkouts.forEach((exercise) => {
+		// 	if (e.target.id === exercise.workoutName) {
+		// 		setPending(true);
+		// 	}
+		// });
+		workouts.data.allWorkouts.forEach(async (workout) => {
+			if (workout.name === e.target.id) {
+				setWorkoutId(workout.id);
+				setWorkoutName(workout.name);
+				setWorkoutLevel(workout.level);
+				setWorkoutMuscle(workout.muscle);
+				console.log(workoutMuscle);
+				console.log(getWorkoutName);
+				setWorkoutType(workout.type);
+				if (workoutMuscle === workout.muscle) {
+					setWork({
+						...work,
+						name: getWorkoutName,
+					});
 
-		const { difficulty, ...rest } = work;
-		const res = await generateExercises.mutateAsync({
-			...rest,
-			level: difficulty,
-		});
+					setWork({
+						...work,
+						difficulty: workoutLevel as DifficultyLevel,
+					});
+					setWork({
+						...work,
+						type: workoutType as TypeOfExercise,
+					});
+					setWork({
+						...work,
+						muscle: workoutMuscle as TypeOfMuscle,
+					});
+					const { difficulty, ...rest } = work;
 
-		setStartWorkout(await res.json());
+					const res = await generateExercises.mutateAsync({
+						...rest,
+						level: difficulty,
+					});
+
+					setStartWorkout(await res.json());
+
+					console.log(work);
+				}
+			}
+		});
 	};
 
 	console.log(startWorkout);
+	if (SavedExercises.loading) {
+		return <div>loading...</div>;
+	}
+	if (SavedExercises.error) {
+		return <div>error retrieving workouts</div>;
+	}
 	if (workouts.loading) {
 		return <div>loading...</div>;
 	}
@@ -72,7 +107,7 @@ export default function workouts() {
 	}
 
 	return (
-		<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 to-gray-700">
+		<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 pb-12 to-gray-700">
 			<div className="p-10 md:w-screen md:h-screen">
 				{startWorkout.length === 0 ? (
 					<>
@@ -118,15 +153,28 @@ export default function workouts() {
 												<TableCell className="font-sm text-zinc-300">
 													{workout.level}
 												</TableCell>
+
 												<TableCell className="font-sm text-zinc-300">
-													<Button
-														className="font-bold bg-green-700 rounded p-1  text-zinc-300"
-														id={getWorkoutId}
-														onClick={handleClick}
-														type="button"
-													>
-														Start Workout
-													</Button>
+													{}
+													{isPending ? (
+														<Button
+															className="font-bold bg-green-700 rounded p-1  text-zinc-300"
+															id={workout.name}
+															onClick={handleClick}
+															type="button"
+														>
+															Continue Workout
+														</Button>
+													) : (
+														<Button
+															className="font-bold bg-green-700 rounded p-1  text-zinc-300"
+															id={workout.name}
+															onClick={handleClick}
+															type="button"
+														>
+															Start Workout
+														</Button>
+													)}
 												</TableCell>
 											</TableRow>
 										</>
@@ -181,12 +229,13 @@ export default function workouts() {
 								</TableHeader>
 								{startWorkout.map((workout) => {
 									return (
-										<TableBody key={workout.name}>
+										<TableBody>
 											<TableRow>
 												<TableCell className="font-sm text-zinc-300">
 													<DialogDemo
 														name={workout.name}
 														description={workout.instructions}
+														workoutName={getWorkoutName}
 													/>
 												</TableCell>
 												<TableCell className="font-sm text-zinc-300">
@@ -224,6 +273,15 @@ export default function workouts() {
 									);
 								})}
 							</Table>
+							<div className="flex p-0 justify-end px-8">
+								<Button
+									className=" font-bold bg-green-700 "
+									variant="outline"
+									type="button"
+								>
+									Submit
+								</Button>
+							</div>
 						</div>
 					</>
 				)}

@@ -54,6 +54,7 @@ export type ExerciseLog = {
 	sets: string;
 	reps: string;
 	weight: string;
+	workoutName: string;
 };
 export type NewExercise = Pick<
 	Exercise,
@@ -61,7 +62,7 @@ export type NewExercise = Pick<
 >;
 export type NewExerciseLog = Pick<
 	ExerciseLog,
-	"name" | "sets" | "reps" | "weight"
+	"name" | "sets" | "reps" | "weight" | "workoutName"
 >;
 
 export type PendingWorkout = {

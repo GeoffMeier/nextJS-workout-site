@@ -11,6 +11,7 @@ export const workouts = pgTable("workouts", {
 export const LogExercises = pgTable("ExerciseLog", {
 	id: serial("id").primaryKey(),
 	name: text("name"),
+	workoutName: text("workoutName"),
 	sets: text("sets"),
 	reps: text("reps"),
 	weight: text("weight"),

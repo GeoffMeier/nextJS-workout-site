@@ -11,6 +11,7 @@ type Workout = {
 type Log = {
 	id: string;
 	name: string;
+	workoutName: string;
 	sets: string;
 	reps: string;
 	weight: string;
@@ -24,6 +25,15 @@ export function useWorkouts() {
 		queryKey: ["workouts", "all"],
 		queryFn: async () => {
 			const response = await fetch("/api/workouts");
+			return response.json();
+		},
+	});
+}
+export function useSavedExercises() {
+	return useAsyncData<{ allWorkouts: Log[] }>({
+		queryKey: ["pendingWorkouts", "all"],
+		queryFn: async () => {
+			const response = await fetch("/api/pendingWorkouts");
 			return response.json();
 		},
 	});
