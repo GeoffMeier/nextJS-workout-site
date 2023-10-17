@@ -12,7 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ExerciseLog, NewExerciseLog } from "../workout/_workout/exercises";
 import { useState } from "react";
-import { useAddExerciseLog } from "../workout/_workout/queries";
+import {
+	useAddExerciseLog,
+	useSavedExercises,
+} from "../workout/_workout/queries";
 
 export function DialogDemo({ name, description, workoutName }) {
 	const initialLog: NewExerciseLog = {
@@ -29,7 +32,7 @@ export function DialogDemo({ name, description, workoutName }) {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
+		console.log("hit ");
 		const { name, sets, reps, weight, workoutName } = log;
 
 		try {

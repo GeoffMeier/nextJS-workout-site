@@ -56,6 +56,17 @@ export type ExerciseLog = {
 	weight: string;
 	workoutName: string;
 };
+export type History = {
+	workoutName: string;
+	exercises: [
+		{
+			name: string;
+			sets: string;
+			reps: string;
+			weight: string;
+		}
+	];
+};
 export type NewExercise = Pick<
 	Exercise,
 	"name" | "type" | "muscle" | "difficulty"

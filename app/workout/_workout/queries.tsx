@@ -16,6 +16,18 @@ type Log = {
 	reps: string;
 	weight: string;
 };
+type WorkoutHistory = {
+	id: string;
+	workoutName: string;
+	exercises: [
+		{
+			name: string;
+			sets: string;
+			reps: string;
+			weight: string;
+		}
+	];
+};
 
 import { Exercise, NewExerciseLog } from "./exercises";
 import { ExerciseLog } from "./exercises";
@@ -29,11 +41,21 @@ export function useWorkouts() {
 		},
 	});
 }
+
 export function useSavedExercises() {
 	return useAsyncData<{ allWorkouts: Log[] }>({
 		queryKey: ["pendingWorkouts", "all"],
 		queryFn: async () => {
 			const response = await fetch("/api/pendingWorkouts");
+			return response.json();
+		},
+	});
+}
+export function useWorkoutHistory() {
+	return useAsyncData<{ allWorkouts: WorkoutHistory[] }>({
+		queryKey: ["workoutHistory", "all"],
+		queryFn: async () => {
+			const response = await fetch("/api/workoutHistory");
 			return response.json();
 		},
 	});
@@ -48,12 +70,26 @@ export function useSavedExercises() {
 // 		},
 // 	});
 // }
-
+type NewWorkoutHistory = Omit<WorkoutHistory, "id">;
 export function useAddWorkout() {
 	return useMutation({
 		mutationKey: ["workouts", "add"],
 		mutationFn: async (newWorkout: NewWorkout) => {
 			return await fetch("/api/exercises", {
+				method: "POST",
+				body: JSON.stringify(newWorkout),
+				headers: {
+					"content-type": "application/json",
+				},
+			});
+		},
+	});
+}
+export function useAddWorkoutHistory() {
+	return useMutation({
+		mutationKey: ["workoutHistory", "add"],
+		mutationFn: async (newWorkout: NewWorkoutHistory) => {
+			return await fetch("/api/workoutHistory", {
 				method: "POST",
 				body: JSON.stringify(newWorkout),
 				headers: {

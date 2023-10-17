@@ -1,7 +1,6 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import BodyPartsList from "./components/BodyPartsList";
-import BodyPartsExerciseList from "./components/BodyPartsExerciseList";
+
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
