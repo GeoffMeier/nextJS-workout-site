@@ -10,39 +10,43 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ExerciseLog, NewExerciseLog } from "../workout/_workout/exercises";
+import { NewHistory } from "../workout/_workout/exercises";
 import { useState } from "react";
-import {
-	useAddExerciseLog,
-	useSavedExercises,
-} from "../workout/_workout/queries";
+import { useAddHistory } from "../workout/_workout/queries";
 
-export function DialogDemo({ name, description, workoutName }) {
-	const initialLog: NewExerciseLog = {
-		name: name,
+export function DialogDemo({
+	name,
+
+	description,
+	workoutName,
+	workoutID,
+}) {
+	const initialLog: NewHistory = {
 		workoutName: workoutName,
-		sets: "",
-		reps: "",
-		weight: "",
+		workoutId: workoutID,
+		exercises: {
+			name: name,
+			sets: "",
+			reps: "",
+			weight: "",
+		},
 	};
 
-	const [log, setLog] = useState<NewExerciseLog>(initialLog);
+	const [log, setLog] = useState<NewHistory>(initialLog);
 	const [isSaved, setIsSaved] = useState(false); // State to track if changes are saved
-	const addExerciseMutation = useAddExerciseLog();
+	const addExerciseMutation = useAddHistory();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		console.log("hit ");
-		const { name, sets, reps, weight, workoutName } = log;
+		const { workoutName, workoutId, exercises } = log;
 
 		try {
 			// Save the exercise log to the database using the mutation
 			const res = await addExerciseMutation.mutateAsync({
-				name,
+				workoutId,
 				workoutName,
-				sets,
-				reps,
-				weight,
+				exercises,
 			});
 
 			// Process the response as needed
@@ -55,8 +59,6 @@ export function DialogDemo({ name, description, workoutName }) {
 			console.error("Error saving exercise log:", error);
 		}
 	};
-
-	console.log(log);
 
 	return (
 		<Dialog>
@@ -76,7 +78,7 @@ export function DialogDemo({ name, description, workoutName }) {
 						onChange={() => {
 							setLog({
 								...log,
-								name: name,
+								workoutName: name,
 							});
 						}}
 					>
@@ -92,17 +94,22 @@ export function DialogDemo({ name, description, workoutName }) {
 						{isSaved ? (
 							<Input
 								id="sets"
-								value={log.sets}
+								value={log.exercises.sets}
 								className="col-span-1 bg-green-500"
 							/>
 						) : (
 							<Input
 								id="sets"
-								value={log.sets}
+								value={log.exercises.sets}
 								onChange={(e) => {
 									setLog({
 										...log,
-										sets: e.target.value,
+										exercises: {
+											name: log.exercises.name,
+											reps: log.exercises.reps,
+											weight: log.exercises.weight,
+											sets: e.target.value,
+										},
 									});
 								}}
 								className="col-span-1"
@@ -116,17 +123,22 @@ export function DialogDemo({ name, description, workoutName }) {
 						{isSaved ? (
 							<Input
 								id="reps"
-								value={log.reps}
+								value={log.exercises.reps}
 								className="col-span-1 bg-green-500"
 							/>
 						) : (
 							<Input
 								id="reps"
-								value={log.reps}
+								value={log.exercises.reps}
 								onChange={(e) => {
 									setLog({
 										...log,
-										reps: e.target.value,
+										exercises: {
+											name: log.exercises.name,
+											sets: log.exercises.sets,
+											weight: log.exercises.weight,
+											reps: e.target.value,
+										},
 									});
 								}}
 								className="col-span-1"
@@ -140,17 +152,22 @@ export function DialogDemo({ name, description, workoutName }) {
 						{isSaved ? (
 							<Input
 								id="weight"
-								value={log.weight}
+								value={log.exercises.weight}
 								className="col-span-1 bg-green-500"
 							/>
 						) : (
 							<Input
 								id="weight"
-								value={log.weight}
+								value={log.exercises.weight}
 								onChange={(e) => {
 									setLog({
 										...log,
-										weight: e.target.value,
+										exercises: {
+											name: log.exercises.name,
+											sets: log.exercises.sets,
+											reps: log.exercises.reps,
+											weight: e.target.value,
+										},
 									});
 								}}
 								className="col-span-1"

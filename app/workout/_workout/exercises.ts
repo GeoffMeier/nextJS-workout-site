@@ -58,22 +58,21 @@ export type ExerciseLog = {
 };
 export type History = {
 	workoutName: string;
-	exercises: [
-		{
-			name: string;
-			sets: string;
-			reps: string;
-			weight: string;
-		}
-	];
+	workoutId: string;
+	exercises: {
+		name: string;
+		sets: string;
+		reps: string;
+		weight: string;
+	};
 };
 export type NewExercise = Pick<
 	Exercise,
 	"name" | "type" | "muscle" | "difficulty"
 >;
-export type NewExerciseLog = Pick<
-	ExerciseLog,
-	"name" | "sets" | "reps" | "weight" | "workoutName"
+export type NewHistory = Pick<
+	History,
+	"workoutName" | "workoutId" | "exercises"
 >;
 
 export type PendingWorkout = {

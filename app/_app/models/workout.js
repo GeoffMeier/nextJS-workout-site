@@ -15,11 +15,11 @@ export const workoutHistory = pgTable("WorkoutHistory", {
 	exercises: jsonb("exercises"),
 });
 
-export const LogExercises = pgTable("ExerciseLog", {
-	id: serial("id").primaryKey(),
-	name: text("name"),
-	workoutName: text("workoutName"),
-	sets: text("sets"),
-	reps: text("reps"),
-	weight: text("weight"),
-});
+// export const LogExercises = pgTable("ExerciseLog", {
+// 	id: serial("id").primaryKey(),
+// 	name: text("name"),
+// 	workoutName: text("workoutName"),
+// 	sets: text("sets"),
+// 	reps: text("reps"),
+// 	weight: text("weight"),
+// });

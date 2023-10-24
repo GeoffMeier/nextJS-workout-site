@@ -9,7 +9,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-import { useAddWorkout, useWorkouts } from "../_workout/queries";
+import {
+	useAddWorkout,
+	useAddWorkoutToPage,
+	useWorkouts,
+} from "../_workout/queries";
 import { useSearchParams } from "next/navigation";
 import {
 	Card,
@@ -18,27 +22,78 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+	DifficultyLevel,
+	Exercise,
+	NewExercise,
+	TypeOfExercise,
+	TypeOfMuscle,
+} from "../_workout/exercises";
+import { DialogDemo } from "@/app/components/DialogDemo";
 
 export default function startWorkout() {
 	const [isStarted, setStarted] = useState(false);
 	const searchParams = useSearchParams();
+	const [getWorkoutName, setWorkoutName] = useState("");
+	const [getWorkoutId, setWorkoutId] = useState("");
+
+	const [newWorkout, setWorkout] = useState<NewExercise>();
+	const [getExercises, setExercises] = useState<Exercise[]>([]);
 
 	const id = searchParams.get("id");
 
 	console.log(id);
 	const generateExercises = useAddWorkout();
 	const workouts = useWorkouts();
+	const addToPage = useAddWorkoutToPage();
+
+	const handleBeginWorkout = async (e) => {
+		e.preventDefault();
+
+		// Check if newWorkout is not already set
+		if (!newWorkout) {
+			workouts.data.allWorkouts.forEach(async (workout) => {
+				if (workout.id === id) {
+					console.log("hitt");
+					setWorkout({
+						name: workout.name,
+						type: workout.type as TypeOfExercise,
+						muscle: workout.muscle as TypeOfMuscle,
+						difficulty: workout.level as DifficultyLevel,
+					});
+					setWorkoutName(workout.name);
+					setWorkoutId(workout.id);
+					// Use try-catch to handle errors
+					try {
+						const res = await generateExercises.mutateAsync({
+							// Pass the correct payload here
+							name: workout.name,
+							type: workout.type as TypeOfExercise,
+							muscle: workout.muscle as TypeOfMuscle,
+							level: workout.level as DifficultyLevel,
+						});
+
+						// Handle form submission with the selected options
+						console.log(res);
+
+						// React Query mutations typically return the updated data
+						// Set the exercises from the result
+						setExercises(await res.json());
+
+						setStarted(true);
+					} catch (error) {
+						console.error("Error fetching exercises:", error);
+					}
+				}
+			});
+		}
+	};
+
 	if (workouts.loading) {
 		return <div>loading...</div>;
 	}
@@ -64,7 +119,7 @@ export default function startWorkout() {
 											</CardDescription>
 										</CardHeader>
 										<CardContent>
-											<form>
+											<form onSubmit={handleBeginWorkout} id={workout.id}>
 												<div className="grid w-full items-center gap-4 ">
 													<div className="flex flex-col space-y-1.5 ">
 														<Label
@@ -84,13 +139,13 @@ export default function startWorkout() {
 													<div className="flex flex-col space-y-1.5 ">
 														<Label
 															className="font-semibold text-indigo-500"
-															htmlFor="name"
+															htmlFor="type"
 														>
 															Exercise Type
 														</Label>
 														<Input
 															className="bg-zinc-800 text-white"
-															id="name"
+															id="type"
 															value={workout.type}
 															readOnly
 														/>
@@ -98,13 +153,13 @@ export default function startWorkout() {
 													<div className="flex flex-col space-y-1.5 ">
 														<Label
 															className="font-semibold text-indigo-500"
-															htmlFor="name"
+															htmlFor="level"
 														>
 															Level
 														</Label>
 														<Input
 															className="bg-zinc-800 text-white"
-															id="name"
+															id="level"
 															value={workout.level}
 															readOnly
 														/>
@@ -112,13 +167,13 @@ export default function startWorkout() {
 													<div className="flex flex-col space-y-1.5 ">
 														<Label
 															className="font-semibold text-indigo-500"
-															htmlFor="name"
+															htmlFor="muscle"
 														>
 															Muscle
 														</Label>
 														<Input
 															className="bg-zinc-800 text-white"
-															id="name"
+															id="muscle"
 															value={workout.muscle}
 															readOnly
 														/>
@@ -143,64 +198,69 @@ export default function startWorkout() {
 					return null;
 				})}
 
-			{workouts.data.allWorkouts.map(
-				(workout) =>
-					// 	workout.id === id ? (
-					// 		<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 to-gray-700">
-					// 			<div className="p-10 md:w-screen md:h-screen">
-					// 				<h2 className="text-indigo-500 text-center pb-10 font-semibold uppercase">
-					// 					{workout.name} Started
-					// 				</h2>
-					// 				<div className="  border bg-zinc-800 md:rounded-lg py-4">
-					// 					<Table id="workouts" className=" ">
-					// 						<TableHeader>
-					// 							<TableRow className="gap-10">
-					// 								<TableHead className="text-indigo-500 font-sans font-bold">
-					// 									Workout Details
-					// 								</TableHead>
-					// 								<TableHead className="text-indigo-500 font-sans font-bold">
-					// 									Name
-					// 								</TableHead>
-					// 								<TableHead className="text-indigo-500 font-sans font-bold">
-					// 									Muscle
-					// 								</TableHead>
-					// 								<TableHead className="text-indigo-500 font-sans font-bold">
-					// 									Type
-					// 								</TableHead>
-					// 								<TableHead className="text-indigo-500 font-sans font-bold">
-					// 									level
-					// 								</TableHead>
-					// 							</TableRow>
-					// 						</TableHeader>
-					// 						<TableBody key={workout.name}>
-					// 							<TableRow>
-					// 								<TableCell className="font-sm text-zinc-300">
-					// 									{/* <DialogDemo name={}/> */}
-					// 								</TableCell>
-					// 								<TableCell className="font-sm text-zinc-300">
-					// 									{workout.name}
-					// 								</TableCell>
-
-					// 								<TableCell className="font-sm text-zinc-300">
-					// 									{workout.muscle}
-					// 								</TableCell>
-					// 								<TableCell className="font-sm text-zinc-300">
-					// 									{workout.type}
-					// 								</TableCell>
-					// 								<TableCell className="font-sm text-zinc-300">
-					// 									{workout.level}
-					// 								</TableCell>
-					// 							</TableRow>
-					// 						</TableBody>
-					// 					</Table>
-					// 				</div>
-					// 			</div>
-					// 		</div>
-					// 	) : (
-					// 		""
-					// 	)
-
-					""
+			{isStarted && (
+				<div className=" flex justify-center  bg-gradient-to-b from-zinc-950 pb-12 to-gray-700">
+					<div className="p-10 md:w-screen md:h-screen">
+						<h2 className="text-indigo-500 text-center pb-10 font-semibold uppercase">
+							Ready to Start Workouts
+						</h2>
+						<div className="  border bg-zinc-800 md:rounded-lg py-4">
+							<Table>
+								<TableCaption>
+									Enjoy Your Workout! Track your workout data using the workout
+									details choice
+								</TableCaption>
+								<TableHeader>
+									<TableRow>
+										<TableHead className="text-indigo-500 font-sans font-bold">
+											Workout Details
+										</TableHead>
+										<TableHead className="text-indigo-500 font-sans font-bold">
+											Exercise Name
+										</TableHead>
+										<TableHead className="text-indigo-500 font-sans font-bold">
+											Muscle
+										</TableHead>
+										<TableHead className="text-indigo-500 font-sans font-bold">
+											Type
+										</TableHead>
+										<TableHead className="text-indigo-500 font-sans font-bold">
+											Level
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+								{getExercises.map((exercise) => {
+									return (
+										<TableBody>
+											<TableRow>
+												<TableCell>
+													<DialogDemo
+														name={exercise.name}
+														workoutID={getWorkoutId}
+														workoutName={getWorkoutName}
+														description={exercise.instructions}
+													></DialogDemo>
+												</TableCell>
+												<TableCell className="font-sm text-zinc-300">
+													{exercise.name}
+												</TableCell>
+												<TableCell className="font-sm text-zinc-300">
+													{exercise.muscle}
+												</TableCell>
+												<TableCell className="font-sm text-zinc-300">
+													{exercise.type}
+												</TableCell>
+												<TableCell className="font-sm text-zinc-300">
+													{exercise.difficulty}
+												</TableCell>
+											</TableRow>
+										</TableBody>
+									);
+								})}
+							</Table>
+						</div>
+					</div>
+				</div>
 			)}
 		</>
 	);

@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "../../_app/db";
-import {
-	LogExercises,
-	workoutHistory,
-	workouts,
-} from "../../_app/models/workout";
+import { workoutHistory, workouts } from "../../_app/models/workout";
 
 export async function GET(req) {
 	const allWorkouts = await db().select().from(workoutHistory);
